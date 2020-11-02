@@ -1,23 +1,32 @@
-import logo from './logo.svg';
+import Viewer from './components/viewer/Viewer';
+import Nav from './components/navigation/Nav';
+import { useState } from 'react';
 import './App.css';
 
 function App() {
+  const [url, setUrl] = useState('');
+  const [responseUrl, setResponseUrl] = useState('');
+
+  const handleChange = e => {
+    setUrl(e.target.value);
+  };
+
+  const handleSubmit = e => {
+    fetch(`http://127.0.0.1:3001/website?url=${url}`).then(async (response) => {
+      if (response.ok) {
+        let json = await response.json();
+        setResponseUrl(json.data);
+        console.log(responseUrl);
+      }
+    }).catch((err) => {
+      console.log(err);
+    })
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Nav handleSubmit={handleSubmit} handleChange={handleChange} />
+      <Viewer url={responseUrl}/>
     </div>
   );
 }

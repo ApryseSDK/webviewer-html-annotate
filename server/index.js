@@ -30,7 +30,7 @@ app.get('/website', (req, res) => {
   scrape(options).then(result => {
     res.status(200).json({
         status: 'success',
-        data: `127.0.0.1:${PORT}/${urlToConvert.hostname}`
+        data: `http://127.0.0.1:${PORT}/${urlToConvert.hostname}/index.html`
     })
   });
 });
