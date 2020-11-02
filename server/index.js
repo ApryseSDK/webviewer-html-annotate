@@ -25,6 +25,7 @@ app.get('/website', (req, res) => {
   const options = {
     urls: [url],
     directory,
+    filenameGenerator: `${urlToConvert.hostname}`
   };
 
   scrape(options).then(result => {
