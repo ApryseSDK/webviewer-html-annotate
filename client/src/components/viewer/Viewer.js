@@ -42,7 +42,7 @@ const Viewer = ({ url }) => {
   useEffect(() => {
     if (HTMLModule && url !== '') {
         console.log(url);
-        HTMLModule.loadHTMLPage(url, 1000, 3000);
+        HTMLModule.loadHTMLPage(url, 2000, 3000);
     }
   }, [HTMLModule, url]);
 

@@ -12,6 +12,7 @@ app.use(cors());
 
 app.get('/website', (req, res) => {
   const { url } = req.query;
+  const timestamp = Date.now();
   if (!url) {
     res.status(400).json({
       status: 'Bad Request',
@@ -20,18 +21,18 @@ app.get('/website', (req, res) => {
     });
   }
   const urlToConvert = new URL(url);
-  const directory = path.resolve(__dirname, `./public/${urlToConvert.hostname}`);
+  const directory = path.resolve(__dirname, `./public/${urlToConvert.hostname}${timestamp}`);
 
   const options = {
     urls: [url],
     directory,
-    filenameGenerator: `${urlToConvert.hostname}`
+    filenameGenerator: `${urlToConvert.hostname}${timestamp}`
   };
 
   scrape(options).then(result => {
     res.status(200).json({
         status: 'success',
-        data: `http://127.0.0.1:${PORT}/${urlToConvert.hostname}/index.html`
+        data: `http://127.0.0.1:${PORT}/${urlToConvert.hostname}${timestamp}/index.html`
     })
   });
 });
