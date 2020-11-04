@@ -3,7 +3,7 @@ import { initializeHTMLViewer } from '@pdftron/webviewer-html';
 import { useEffect, useRef, useState } from 'react';
 import './Viewer.css';
 
-const Viewer = ({ url }) => {
+const Viewer = ({ res }) => {
   const viewer = useRef(null);
   const [HTMLModule, setHTMLModule] = useState(null);
 
@@ -14,8 +14,16 @@ const Viewer = ({ url }) => {
       },
       viewer.current,
     ).then(async instance => {
+      const { FitMode, docViewer } = instance; 
+      instance.setFitMode(FitMode.FitPage);
       // Extends WebViewer to allow loading HTML5 files from URL or static folder.
       const htmlModule = await initializeHTMLViewer(instance);
+
+      docViewer.on('documentLoaded', () => {
+        setTimeout(() => {
+          instance.setFitMode(FitMode.FitPage);
+        }, 1500);
+      });
 
       setHTMLModule(htmlModule);
 
@@ -40,11 +48,10 @@ const Viewer = ({ url }) => {
   }, []);
 
   useEffect(() => {
-    if (HTMLModule && url !== '') {
-        console.log(url);
-        HTMLModule.loadHTMLPage(url, 2000, 3000);
+    if (HTMLModule && res.length > 0) {
+      HTMLModule.loadHTMLPage(res[0], res[1], res[2]);
     }
-  }, [HTMLModule, url]);
+  }, [HTMLModule, res]);
 
   return <div ref={viewer} className="HTMLViewer"></div>;
 };
