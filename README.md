@@ -1,5 +1,5 @@
 # webviewer-html-annotate
-Annotate live HTML pages by simply providing URL. This way you can preserve all the animations and any interactive content.
+Annotate live HTML pages by simply providing URL. This way you can preserve all the animations and any interactive content. [Watch the video](https://youtu.be/OGswLirzMW8) to see a demo and walkthrough of the project.
 
 The sample uses [WebViewer HTML by PDFTron](https://www.npmjs.com/package/@pdftron/webviewer-html) for annotating HTML, and [Website-scraper](https://www.npmjs.com/package/website-scraper) for scraping the website from URL. 
 
