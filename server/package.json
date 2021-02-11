@@ -4,15 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --ignore 'public/' index.js"
+    "start": "node index.js"
   },
   "author": "Andrey Safonov",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "nodemon": "^2.0.6",
     "puppeteer": "^7.0.4",
     "website-scraper": "^4.2.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
   }
 }
