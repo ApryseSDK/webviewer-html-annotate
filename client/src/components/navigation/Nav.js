@@ -42,6 +42,11 @@ const Nav = ({ handleSubmit }) => {
         onChange={({ value }) => {
           setUrl(value);
         }}
+        onKeyDown={({ event }) => {
+          if (event.keyCode === 13) {
+            handleSubmit(`${protocol}://${url}`, width, height);
+          }
+        }}
         label="Domain"
         value={url}
         type="url"
