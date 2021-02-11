@@ -37,5 +37,5 @@ npm start
 1. Client app makes the request to the Node.js Express server.
 2. Node.js Express server serves the endpoint `/website?url=someurl.com`, 
 3. From the `url` query parameter, we download all the website dependencies (HTML, CSS, JS, images).
-4. The server responds back with link to access downloaded resources.
+4. The server responds back with link to access downloaded resources and a thumbnail preview in `base64`.
 5. WebViewer then renders out live HTML that can be annotated.
