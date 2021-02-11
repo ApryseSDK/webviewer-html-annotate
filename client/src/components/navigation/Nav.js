@@ -1,13 +1,25 @@
 import { useState } from 'react';
 import './Nav.css';
-import { Heading, TextField, Button, Text } from 'gestalt';
+import { SelectList, Heading, TextField, Button, Text } from 'gestalt';
 import 'gestalt/dist/gestalt.css';
 
-const Nav = ({ handleSubmit }) => {
+const protocolOptions = [
+  {
+    value: 'https',
+    label: 'https',
+  },
+  {
+    value: 'http',
+    label: 'http',
+  },
+];
+
+const Nav = ({ handleSubmit, fetchError }) => {
   const [url, setUrl] = useState('');
   const [width, setWidth] = useState(1000);
   const [height, setHeight] = useState(2000);
   const [error, setError] = useState(false);
+  const [protocol, setProtocol] = useState(protocolOptions[0].value);
 
   return (
     <div className="Nav">
@@ -17,16 +29,29 @@ const Nav = ({ handleSubmit }) => {
         and saved server-side as a snapshot in time. Then you will be annotate
         that copy here.
       </p>
+      <SelectList
+        id="protocol"
+        name="protocol"
+        label="Protocol"
+        onChange={({ value }) => setProtocol(value)}
+        options={protocolOptions}
+        value={protocol}
+      />
       <TextField
         id="url"
         onChange={({ value }) => {
           setUrl(value);
         }}
-        placeholder="https://"
-        label="URL to load"
+        onKeyDown={({ event }) => {
+          if (event.keyCode === 13) {
+            handleSubmit(`${protocol}://${url}`, width, height);
+          }
+        }}
+        label="Domain"
         value={url}
         type="url"
       />
+      <p>{`${protocol}://${url}`}</p>
       <TextField
         id="width"
         onChange={({ value }) => {
@@ -52,13 +77,14 @@ const Nav = ({ handleSubmit }) => {
         inline
         onClick={() => {
           if (url !== '' && width !== 0 && height !== 0) {
-            handleSubmit(url, width, height);
+            handleSubmit(`${protocol}://${url}`, width, height);
           } else {
             setError(true);
           }
         }}
       />
       {error ? <Text color="red">Please enter a valid URL, width and height and try again.</Text> : null}
+      {fetchError ? <Text color="red">{fetchError}</Text> : null}
     </div>
   );
 };
