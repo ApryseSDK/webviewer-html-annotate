@@ -14,7 +14,7 @@ const protocolOptions = [
   },
 ];
 
-const Nav = ({ handleSubmit }) => {
+const Nav = ({ handleSubmit, fetchError }) => {
   const [url, setUrl] = useState('');
   const [width, setWidth] = useState(1000);
   const [height, setHeight] = useState(2000);
@@ -84,6 +84,7 @@ const Nav = ({ handleSubmit }) => {
         }}
       />
       {error ? <Text color="red">Please enter a valid URL, width and height and try again.</Text> : null}
+      {fetchError ? <Text color="red">{fetchError}</Text> : null}
     </div>
   );
 };

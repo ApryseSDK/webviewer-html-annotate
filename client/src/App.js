@@ -8,6 +8,7 @@ import './App.css';
 function App() {
   const [response, setResponse] = useState([]);
   const [show, setShow] = useState(false);
+  const [fetchError, setFetchError] = useState('');
 
   const handleSubmit = (url, width, height) => {
     setShow(true);
@@ -20,7 +21,8 @@ function App() {
         }
       })
       .catch(err => {
-        console.log(err);
+        setShow(false);
+        setFetchError(err);
       });
   };
 
@@ -44,7 +46,7 @@ function App() {
       </Layer>
 
       <div className="App">
-        <Nav handleSubmit={handleSubmit} />
+        <Nav handleSubmit={handleSubmit} fetchError={fetchError}/>
         <Viewer res={response} />
       </div>
     </div>
