@@ -49,7 +49,7 @@ const Viewer = ({ res }) => {
 
   useEffect(() => {
     if (HTMLModule && res.length > 0) {
-      HTMLModule.loadHTMLPage(res[0], res[1], res[2]);
+      HTMLModule.loadHTMLPage(res[0].url, res[1], res[2], res[0].thumb);
     }
   }, [HTMLModule, res]);
 

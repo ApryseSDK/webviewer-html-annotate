@@ -11,7 +11,7 @@ function App() {
 
   const handleSubmit = (url, width, height) => {
     setShow(true);
-    fetch(`http://127.0.0.1:3001/website?url=${url}`)
+    fetch(`http://127.0.0.1:3001/website?url=${url}&width=${width}&height=${height}`)
       .then(async response => {
         if (response.ok) {
           let json = await response.json();

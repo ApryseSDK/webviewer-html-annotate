@@ -1,7 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const scrape = require('website-scraper');
+const puppeteer = require('puppeteer');
 const path = require('path');
+const fs = require('fs');
 
 const PORT = 3001;
 
@@ -10,8 +12,9 @@ const app = express();
 app.use(express.static('public'));
 app.use(cors());
 
+// endpoint to scrape the website and generate a thumb preview
 app.get('/website', (req, res) => {
-  const { url } = req.query;
+  const { url, width, height } = req.query;
   const timestamp = Date.now();
   if (!url) {
     res.status(400).json({
@@ -21,19 +24,51 @@ app.get('/website', (req, res) => {
     });
   }
   const urlToConvert = new URL(url);
-  const directory = path.resolve(__dirname, `./public/${urlToConvert.hostname}${timestamp}`);
+  const directory = path.resolve(
+    __dirname,
+    `./public/${urlToConvert.hostname}${timestamp}`
+  );
 
   const options = {
     urls: [url],
     directory,
-    filenameGenerator: `${urlToConvert.hostname}${timestamp}`
+    filenameGenerator: `${urlToConvert.hostname}${timestamp}`,
   };
 
-  scrape(options).then(result => {
-    res.status(200).json({
+  scrape(options).then(async (result) => {
+    // get the screenshot with puppeteer after the scrape is complete
+    const browser = await puppeteer.launch({
+      defaultViewport: {
+        width: Number(width),
+        height: Number(height),
+      },
+    });
+    const page = await browser.newPage();
+    await page.goto(
+      `http://127.0.0.1:${PORT}/${urlToConvert.hostname}${timestamp}/index.html`
+    );
+    const thumbPath = path.resolve(
+      __dirname,
+      `./public/${urlToConvert.hostname}${timestamp}/thumb.png`
+    );
+    await page.screenshot({
+      path: thumbPath,
+    });
+
+    // read the file from the filepath and respond to server with URL and thumb
+    await fs.readFile(thumbPath, { encoding: 'base64' }, (err, data) => {
+      if (err) throw err;
+      const prefix = 'data:image/png;base64,';
+      res.status(200).json({
         status: 'success',
-        data: `http://127.0.0.1:${PORT}/${urlToConvert.hostname}${timestamp}/index.html`
-    })
+        data: {
+          url: `http://127.0.0.1:${PORT}/${urlToConvert.hostname}${timestamp}/index.html`,
+          thumb: prefix + data,
+        },
+      });
+    });
+
+    await browser.close();
   });
 });
 
