@@ -12,10 +12,24 @@ const Viewer = ({ res }) => {
       {
         path: 'lib',
       },
-      viewer.current,
-    ).then(async instance => {
-      const { FitMode, docViewer } = instance; 
+      viewer.current
+    ).then(async (instance) => {
+      const { FitMode, docViewer, Feature } = instance;
       instance.setFitMode(FitMode.FitPage);
+      // disable built-in search since there is no text layer
+      instance.disableFeatures([Feature.Search]);
+      // disable text based annotations tools since there is no text layer
+      instance.disableElements([
+        'viewControlsButton',
+        'downloadButton',
+        'printButton',
+        'highlightToolGroupButton',
+        'underlineToolGroupButton',
+        'strikeoutToolGroupButton',
+        'squigglyToolGroupButton',
+        'fileAttachmentToolGroupButton',
+        'toolbarGroup-Edit',
+      ]);
       // Extends WebViewer to allow loading HTML5 files from URL or static folder.
       const htmlModule = await initializeHTMLViewer(instance);
 
@@ -30,11 +44,11 @@ const Viewer = ({ res }) => {
       htmlModule.loadHTMLPage(
         'https://www.openstreetmap.org/export/embed.html?bbox=-0.004017949104309083%2C51.47612752641776%2C0.00030577182769775396%2C51.478569861898606&layer=mapnik',
         500,
-        500,
+        500
       );
 
       // Add a button that toggles annotation layer to interact with web content underneath
-      instance.setHeaderItems(header => {
+      instance.setHeaderItems((header) => {
         header.push({
           type: 'actionButton',
           img:
