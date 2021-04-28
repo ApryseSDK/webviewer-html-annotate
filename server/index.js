@@ -24,15 +24,16 @@ app.get('/website', (req, res) => {
     });
   }
   const urlToConvert = new URL(url);
+  const pagePath = `${urlToConvert.hostname}${timestamp}`;
   const directory = path.resolve(
     __dirname,
-    `./public/${urlToConvert.hostname}${timestamp}`
+    `./public/${pagePath}`
   );
 
   const options = {
     urls: [url],
     directory,
-    filenameGenerator: `${urlToConvert.hostname}${timestamp}`,
+    filenameGenerator: `${pagePath}`,
   };
 
   scrape(options).then(async (result) => {
@@ -45,11 +46,11 @@ app.get('/website', (req, res) => {
     });
     const page = await browser.newPage();
     await page.goto(
-      `http://127.0.0.1:${PORT}/${urlToConvert.hostname}${timestamp}/index.html`
+      `http://127.0.0.1:${PORT}/${pagePath}/index.html`
     );
     const thumbPath = path.resolve(
       __dirname,
-      `./public/${urlToConvert.hostname}${timestamp}/thumb.png`
+      `./public/${pagePath}/thumb.png`
     );
     await page.screenshot({
       path: thumbPath,
@@ -62,7 +63,7 @@ app.get('/website', (req, res) => {
       res.status(200).json({
         status: 'success',
         data: {
-          url: `http://127.0.0.1:${PORT}/${urlToConvert.hostname}${timestamp}/index.html`,
+          url: `${pagePath}/index.html`,
           thumb: prefix + data,
         },
       });

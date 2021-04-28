@@ -15,7 +15,10 @@ function App() {
     fetch(`http://127.0.0.1:3001/website?url=${url}&width=${width}&height=${height}`)
       .then(async response => {
         if (response.ok) {
-          let json = await response.json();
+          const json = await response.json();
+          if (json.data.url) {
+            json.data.url = `http://localhost:3000/redirect/${json.data.url}`;
+          }
           setResponse([json.data, width, height]);
           setShow(false);
         }
