@@ -16,7 +16,7 @@ const Viewer = ({ res }) => {
     ).then(async (instance) => {
       const { FitMode, docViewer } = instance;
       instance.setFitMode(FitMode.FitPage);
-      // disable text based annotations tools since there is no text layer
+      // disable some incompatible tools
       instance.disableElements([
         'viewControlsButton',
         'downloadButton',
@@ -39,17 +39,22 @@ const Viewer = ({ res }) => {
 
       setHTMLModule(htmlModule);
 
-      htmlModule.loadHTMLPage(
-        'https://www.openstreetmap.org/export/embed.html?bbox=-0.004017949104309083%2C51.47612752641776%2C0.00030577182769775396%2C51.478569861898606&layer=mapnik',
-        500,
-        500
-      );
+      htmlModule.loadHTMLPages({
+        htmlPages: [
+          {
+            url:
+              'https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d41656.714956835!2d-123.0850416!3d49.26607539999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.  1!5e0!3m2!1sen!2sca!4v1591640645684!5m2!1sen!2sca',
+            width: 1800,
+            height: 1100,
+          }
+        ],
+      });
     });
   }, []);
 
   useEffect(() => {
     if (HTMLModule && res.length > 0) {
-      HTMLModule.loadHTMLPage(res[0].url, res[1], res[2], res[0].thumb);
+      HTMLModule.loadHTMLPage({url: res[0].url, width: res[1], height: res[2], thumb: res[0].thumb});
     }
   }, [HTMLModule, res]);
 
