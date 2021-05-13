@@ -6,7 +6,7 @@ import 'gestalt/dist/gestalt.css';
 import './App.css';
 
 function App() {
-  const [response, setResponse] = useState([]);
+  const [response, setResponse] = useState({});
   const [show, setShow] = useState(false);
   const [fetchError, setFetchError] = useState('');
 
@@ -19,7 +19,7 @@ function App() {
           if (json.data.url) {
             json.data.url = `http://localhost:3000/redirect/${json.data.url}`;
           }
-          setResponse([json.data, width, height]);
+          setResponse({url: json.data.url, width, height, thumb: json.data.thumb});
           setShow(false);
         }
       })

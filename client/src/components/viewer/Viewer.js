@@ -53,8 +53,9 @@ const Viewer = ({ res }) => {
   }, []);
 
   useEffect(() => {
-    if (HTMLModule && res.length > 0) {
-      HTMLModule.loadHTMLPage({url: res[0].url, width: res[1], height: res[2], thumb: res[0].thumb});
+    if (HTMLModule && Object.keys(res).length > 0) {
+      const { url, width, height, thumb } = res;
+      HTMLModule.loadHTMLPage({url, width, height, thumb});
     }
   }, [HTMLModule, res]);
 
