@@ -6,7 +6,7 @@ import 'gestalt/dist/gestalt.css';
 import './App.css';
 
 function App() {
-  const [response, setResponse] = useState([]);
+  const [response, setResponse] = useState({});
   const [show, setShow] = useState(false);
   const [fetchError, setFetchError] = useState('');
 
@@ -15,8 +15,11 @@ function App() {
     fetch(`http://127.0.0.1:3001/website?url=${url}&width=${width}&height=${height}`)
       .then(async response => {
         if (response.ok) {
-          let json = await response.json();
-          setResponse([json.data, width, height]);
+          const json = await response.json();
+          if (json.data.url) {
+            json.data.url = `http://localhost:3000/redirect/${json.data.url}`;
+          }
+          setResponse({url: json.data.url, width, height, thumb: json.data.thumb});
           setShow(false);
         }
       })
