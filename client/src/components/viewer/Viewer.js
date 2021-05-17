@@ -3,7 +3,7 @@ import { initializeHTMLViewer } from '@pdftron/webviewer-html';
 import { useEffect, useRef, useState } from 'react';
 import './Viewer.css';
 
-const Viewer = ({ res }) => {
+const Viewer = ({ res, loadURL }) => {
   const viewer = useRef(null);
   const [HTMLModule, setHTMLModule] = useState(null);
 
@@ -39,16 +39,11 @@ const Viewer = ({ res }) => {
 
       setHTMLModule(htmlModule);
 
-      htmlModule.loadHTMLPages({
-        htmlPages: [
-          {
-            url:
-              'https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d41656.714956835!2d-123.0850416!3d49.26607539999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.  1!5e0!3m2!1sen!2sca!4v1591640645684!5m2!1sen!2sca',
-            width: 1800,
-            height: 1100,
-          }
-        ],
-      });
+      loadURL(
+        `https://www.pdftron.com/api/web/global.html`,
+        1800,
+        1100
+      );
     });
   }, []);
 
