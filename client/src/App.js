@@ -25,7 +25,7 @@ function App() {
       })
       .catch(err => {
         setShow(false);
-        setFetchError(err);
+        setFetchError('Trouble fetching the URL, please make sure the server is running. `cd server && npm start`');
       });
   };
 

@@ -40,7 +40,7 @@ const Viewer = ({ res, loadURL }) => {
       setHTMLModule(htmlModule);
 
       loadURL(
-        `https://www.pdftron.com/api/web/global.html`,
+        `https://www.pdftron.com/`,
         1800,
         1100
       );
