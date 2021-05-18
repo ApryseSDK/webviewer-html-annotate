@@ -10,7 +10,7 @@ function App() {
   const [show, setShow] = useState(false);
   const [fetchError, setFetchError] = useState('');
 
-  const handleSubmit = (url, width, height) => {
+  const loadURL = (url, width, height) => {
     setShow(true);
     fetch(`http://127.0.0.1:3001/website?url=${url}&width=${width}&height=${height}`)
       .then(async response => {
@@ -25,7 +25,7 @@ function App() {
       })
       .catch(err => {
         setShow(false);
-        setFetchError(err);
+        setFetchError('Trouble fetching the URL, please make sure the server is running. `cd server && npm start`');
       });
   };
 
@@ -49,8 +49,8 @@ function App() {
       </Layer>
 
       <div className="App">
-        <Nav handleSubmit={handleSubmit} fetchError={fetchError}/>
-        <Viewer res={response} />
+        <Nav handleSubmit={loadURL} fetchError={fetchError}/>
+        <Viewer res={response} loadURL={loadURL} />
       </div>
     </div>
   );
