@@ -45,6 +45,7 @@ const Viewer = ({ res, loadURL }) => {
         1100
       );
     });
+    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
