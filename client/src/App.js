@@ -1,13 +1,13 @@
 import Viewer from './components/viewer/Viewer';
 import Nav from './components/navigation/Nav';
 import { useState } from 'react';
-import { Box, Spinner } from '@chakra-ui/react';
 import './App.css';
 
 function App() {
   const [response, setResponse] = useState({});
   const [show, setShow] = useState(false);
   const [fetchError, setFetchError] = useState('');
+  const [pdfBlob, setPdfBlob] = useState(null);
 
   const loadURL = (url, width, height) => {
     setShow(true);
@@ -37,10 +37,31 @@ function App() {
       });
   };
 
+  const downloadPDF = () => {
+    setShow(true);
+    if (response.url) {
+      const urlArray = response.url.split('/');
+      fetch(
+        `http://127.0.0.1:3001/getpdf?url=${urlArray[4]}&width=${response.width}&height=${response.height}`
+      ).then((res) => {
+        return res.blob('application/pdf');
+      }).then((blob) => {
+        console.log(blob);
+        setPdfBlob(blob);
+      });
+    }
+    setShow(false);
+  };
+
   return (
     <div className="App">
-      <Nav handleSubmit={loadURL} fetchError={fetchError} showSpinner={show} />
-      <Viewer res={response} loadURL={loadURL} />
+      <Nav
+        handleSubmit={loadURL}
+        fetchError={fetchError}
+        showSpinner={show}
+        handleDownload={downloadPDF}
+      />
+      <Viewer res={response} loadURL={loadURL} pdf={pdfBlob} />
     </div>
   );
 }

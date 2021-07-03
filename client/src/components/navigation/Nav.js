@@ -22,7 +22,7 @@ const protocolOptions = [
   },
 ];
 
-const Nav = ({ handleSubmit, fetchError, showSpinner }) => {
+const Nav = ({ handleSubmit, fetchError, showSpinner, handleDownload }) => {
   const [url, setUrl] = useState('');
   const [width, setWidth] = useState(1000);
   const [height, setHeight] = useState(2000);
@@ -96,6 +96,15 @@ const Nav = ({ handleSubmit, fetchError, showSpinner }) => {
           }}
         >
           {showSpinner && <Spinner mx={1} label="Loading website" />}Load the website
+        </Button>
+        
+      </FormControl>
+      <FormControl id="downloadPDF">
+        <Button
+          my={3}
+          onClick={() => handleDownload()}
+        >
+          {showSpinner && <Spinner mx={1} label="Loading website" />}Download annotated PDF
         </Button>
         
       </FormControl>

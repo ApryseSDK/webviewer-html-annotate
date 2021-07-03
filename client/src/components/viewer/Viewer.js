@@ -3,9 +3,10 @@ import { initializeHTMLViewer } from '@pdftron/webviewer-html';
 import { useEffect, useRef, useState } from 'react';
 import './Viewer.css';
 
-const Viewer = ({ res, loadURL }) => {
+const Viewer = ({ res, loadURL, pdf }) => {
   const viewer = useRef(null);
   const [HTMLModule, setHTMLModule] = useState(null);
+  const [instance, setInstance] = useState(null);
 
   useEffect(() => {
     WebViewer(
@@ -15,16 +16,13 @@ const Viewer = ({ res, loadURL }) => {
       viewer.current
     ).then(async (instance) => {
       const { FitMode, docViewer } = instance;
+      setInstance(instance);
       instance.setFitMode(FitMode.FitPage);
       // disable some incompatible tools
       instance.disableElements([
         'viewControlsButton',
         'downloadButton',
         'printButton',
-        'highlightToolGroupButton',
-        'underlineToolGroupButton',
-        'strikeoutToolGroupButton',
-        'squigglyToolGroupButton',
         'fileAttachmentToolGroupButton',
         'toolbarGroup-Edit',
       ]);
@@ -39,11 +37,7 @@ const Viewer = ({ res, loadURL }) => {
 
       setHTMLModule(htmlModule);
 
-      loadURL(
-        `https://www.pdftron.com/`,
-        1800,
-        1100
-      );
+      loadURL(`https://www.pdftron.com/`, 1800, 1100);
     });
     // eslint-disable-next-line
   }, []);
@@ -51,9 +45,33 @@ const Viewer = ({ res, loadURL }) => {
   useEffect(() => {
     if (HTMLModule && Object.keys(res).length > 0) {
       const { url, width, height, thumb } = res;
-      HTMLModule.loadHTMLPage({url, width, height, thumb});
+      HTMLModule.loadHTMLPage({ url, width, height, thumb });
     }
   }, [HTMLModule, res]);
+
+  useEffect(() => {
+    const loadDocAndAnnots = async () => {
+      const doc = await instance.CoreControls.createDocument(pdf);
+      const xfdf = await instance.docViewer
+        .getAnnotationManager()
+        .exportAnnotations();
+      const data = await doc.getFileData({ xfdfString: xfdf });
+      const arr = new Uint8Array(data);
+      const blob = new Blob([arr], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'annotated';
+      a.click();
+      a.remove();
+      // in case the Blob uses a lot of memory
+      setTimeout(() => URL.revokeObjectURL(url), 7000);
+    };
+
+    if (instance && pdf) {
+      loadDocAndAnnots();
+    }
+  }, [instance, pdf]);
 
   return <div ref={viewer} className="HTMLViewer"></div>;
 };
