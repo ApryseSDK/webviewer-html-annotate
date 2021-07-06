@@ -11,23 +11,11 @@ import {
 } from '@chakra-ui/react';
 import './Nav.css';
 
-const protocolOptions = [
-  {
-    value: 'https',
-    label: 'https',
-  },
-  {
-    value: 'http',
-    label: 'http',
-  },
-];
-
 const Nav = ({ handleSubmit, fetchError, showSpinner, handleDownload }) => {
   const [url, setUrl] = useState('');
   const [width, setWidth] = useState(1000);
   const [height, setHeight] = useState(2000);
   const [error, setError] = useState(false);
-  const [protocol, setProtocol] = useState(protocolOptions[0].value);
 
   return (
     <div className="Nav">
@@ -37,24 +25,8 @@ const Nav = ({ handleSubmit, fetchError, showSpinner, handleDownload }) => {
         and saved server-side as a snapshot in time. Then you will be annotate
         that copy here.
       </Text>
-      <FormControl id="protocol">
-        <FormLabel>Protocol</FormLabel>
-        <Select
-          id="protocol"
-          value={protocol}
-          onChange={(e) => {
-            setProtocol(e.target.value);
-          }}
-        >
-          {protocolOptions.map(({ value, label }) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </Select>
-      </FormControl>
       <FormControl id="domain">
-        <FormLabel>Domain</FormLabel>
+        <FormLabel>URL of the page</FormLabel>
         <Input
           size="md"
           onChange={(e) => {
@@ -63,7 +35,6 @@ const Nav = ({ handleSubmit, fetchError, showSpinner, handleDownload }) => {
           value={url}
           type="url"
         />
-        <Text py={5}>{`${protocol}://${url}`}</Text>
       </FormControl>
       <FormControl id="width">
         <FormLabel>Width of the page</FormLabel>
@@ -89,7 +60,7 @@ const Nav = ({ handleSubmit, fetchError, showSpinner, handleDownload }) => {
           my={3}
           onClick={() => {
             if (url !== '' && width !== 0 && height !== 0) {
-              handleSubmit(`${protocol}://${url}`, width, height);
+              handleSubmit(url, width, height);
             } else {
               setError(true);
             }
