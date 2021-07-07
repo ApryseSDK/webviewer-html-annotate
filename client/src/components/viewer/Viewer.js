@@ -44,8 +44,8 @@ const Viewer = ({ res, loadURL, pdf }) => {
 
   useEffect(() => {
     if (HTMLModule && Object.keys(res).length > 0) {
-      const { url, width, height, thumb } = res;
-      HTMLModule.loadHTMLPage({ url, width, height, thumb });
+      const { url, width, height, thumb, origUrl } = res;
+      HTMLModule.loadHTMLPage({ url, width, height, thumb, origUrl });
     }
   }, [HTMLModule, res]);
 
