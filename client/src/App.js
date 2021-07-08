@@ -25,6 +25,7 @@ function App() {
             width,
             height,
             thumb: json.data.thumb,
+            origUrl: url
           });
           setShow(false);
         }
