@@ -20,6 +20,10 @@ const Viewer = ({ res, loadURL, pdf }) => {
       instance.setFitMode(FitMode.FitPage);
       // disable some incompatible tools
       instance.disableElements([
+        'highlightToolGroupButton',
+        'underlineToolGroupButton',
+        'strikeoutToolGroupButton',
+        'squigglyToolGroupButton',
         'viewControlsButton',
         'downloadButton',
         'printButton',
