@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import {
   Heading,
-  Select,
+  InputGroup,
+  InputLeftAddon,
   Input,
   Button,
   Text,
@@ -27,14 +28,14 @@ const Nav = ({ handleSubmit, fetchError, showSpinner, handleDownload }) => {
       </Text>
       <FormControl id="domain">
         <FormLabel>URL of the page</FormLabel>
-        <Input
-          size="md"
+        <InputGroup
           onChange={(e) => {
-            setUrl(e.target.value);
+            setUrl(`http://${e.target.value}`);
           }}
-          value={url}
-          type="url"
-        />
+        >
+          <InputLeftAddon children="http://" />
+          <Input placeholder="mysite" />
+        </InputGroup>
       </FormControl>
       <FormControl id="width">
         <FormLabel>Width of the page</FormLabel>
@@ -66,20 +67,17 @@ const Nav = ({ handleSubmit, fetchError, showSpinner, handleDownload }) => {
             }
           }}
         >
-          {showSpinner && <Spinner mx={1} label="Loading website" />}Load the website
+          {showSpinner && <Spinner mx={1} label="Loading website" />}Load the
+          website
         </Button>
-        
       </FormControl>
       <FormControl id="downloadPDF">
-        <Button
-          my={3}
-          onClick={() => handleDownload()}
-        >
-          {showSpinner && <Spinner mx={1} label="Loading website" />}Download annotated PDF
+        <Button my={3} onClick={() => handleDownload()}>
+          {showSpinner && <Spinner mx={1} label="Loading website" />}Download
+          annotated PDF
         </Button>
-        
       </FormControl>
-      
+
       {error && (
         <Text color="red">
           Please enter a valid URL, width and height and try again.
