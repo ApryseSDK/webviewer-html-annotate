@@ -12,6 +12,7 @@
     "cors": "^2.8.5",
     "cors-anywhere": "^0.4.3",
     "express": "^4.17.1",
+    "http-proxy": "^1.18.1",
     "puppeteer": "^7.0.4",
     "website-scraper": "^4.2.3"
   },

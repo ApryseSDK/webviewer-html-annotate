@@ -10,32 +10,40 @@ function App() {
   const [pdfBlob, setPdfBlob] = useState(null);
 
   const loadURL = (url, width, height) => {
-    setShow(true);
-    fetch(
-      `http://127.0.0.1:3001/website?url=${url}&width=${width}&height=${height}`
-    )
-      .then(async (response) => {
-        if (response.ok) {
-          const json = await response.json();
-          if (json.data.url) {
-            json.data.url = `http://localhost:3000/redirect/${json.data.url}`;
-          }
-          setResponse({
-            url: json.data.url,
-            width,
-            height,
-            thumb: json.data.thumb,
-            origUrl: url
-          });
-          setShow(false);
-        }
-      })
-      .catch((err) => {
-        setShow(false);
-        setFetchError(
-          'Trouble fetching the URL, please make sure the server is running. `cd server && npm start`'
-        );
-      });
+    // setShow(true);
+    setResponse({
+      url: 'http://localhost:8080/www.google.ca',
+      origUrl: 'http://localhost:8080/www.google.ca',
+      width: 1800,
+      height: 1100,
+      thumb: '',
+    })
+
+    // fetch(
+    //   `http://127.0.0.1:3001/website?url=${url}&width=${width}&height=${height}`
+    // )
+    //   .then(async (response) => {
+    //     if (response.ok) {
+    //       const json = await response.json();
+    //       if (json.data.url) {
+    //         json.data.url = `http://localhost:3000/redirect/${json.data.url}`;
+    //       }
+    //       setResponse({
+    //         url: json.data.url,
+    //         width,
+    //         height,
+    //         thumb: json.data.thumb,
+    //         origUrl: url
+    //       });
+    //       setShow(false);
+    //     }
+    //   })
+    //   .catch((err) => {
+    //     setShow(false);
+    //     setFetchError(
+    //       'Trouble fetching the URL, please make sure the server is running. `cd server && npm start`'
+    //     );
+    //   });
   };
 
   const downloadPDF = () => {
