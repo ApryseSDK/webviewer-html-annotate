@@ -4,6 +4,7 @@ const scrape = require('website-scraper');
 const puppeteer = require('puppeteer');
 const path = require('path');
 const fs = require('fs');
+const cors_proxy = require('cors-anywhere');
 
 const PORT = 3001;
 
@@ -11,6 +12,12 @@ const app = express();
 
 app.use(express.static('public'));
 app.use(cors());
+
+const CORS_SERVER = cors_proxy.createServer({
+  originWhitelist: [],
+  // requireHeader: [ 'origin', 'x-requested-with' ],
+  removeHeaders: [ 'cookie', 'cookie2' ]
+});
 
 // endpoint to scrape the website and generate a thumb preview
 app.get('/website', (req, res) => {
@@ -31,6 +38,9 @@ app.get('/website', (req, res) => {
     directory,
     filenameGenerator: `${pagePath}`,
   };
+
+  req.url = `/${url}`;
+  CORS_SERVER.emit("request", req, res);
 
   scrape(options).then(async (result) => {
     // get the screenshot with puppeteer after the scrape is complete
