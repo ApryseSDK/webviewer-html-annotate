@@ -12,8 +12,10 @@ function App() {
   const loadURL = (url, width, height) => {
     // setShow(true);
     setResponse({
-      url: 'http://localhost:8080/www.google.ca',
-      origUrl: 'http://localhost:8080/www.google.ca',
+      // url: 'http://localhost:8080/www.google.ca',
+      url: 'http://localhost:3000',
+      // origUrl: 'http://localhost:8080/www.google.ca',
+      origUrl: 'http://localhost:3000',
       width: 1800,
       height: 1100,
       thumb: '',
