@@ -17,7 +17,7 @@ function App() {
       // origUrl: 'http://localhost:8080/www.google.ca',
       origUrl: 'http://localhost:3000',
       width: 1800,
-      height: 1100,
+      height: 8000,
       thumb: '',
     })
 

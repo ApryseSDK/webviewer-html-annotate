@@ -12,10 +12,10 @@ const { response } = require('express');
 
 app.use('/', function(clientRequest, clientResponse) {
     var url;
-    url = 'https://www.teamliquid.com/'
+    // url = 'https://www.teamliquid.com/'
     // url = 'https://www.google.com'
     console.log('----', clientRequest.hostname, clientRequest.url, clientRequest.originalUrl, '--', clientRequest.baseUrl, clientRequest.headers.location);
-    // url = 'https://www.pdftron.com';
+    url = 'https://www.pdftron.com';
     var parsedHost = url.split('/').splice(2).splice(0, 1).join('/')
     console.log('parsedHost', parsedHost);
     var parsedPort;

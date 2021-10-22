@@ -15,7 +15,7 @@ import './Nav.css';
 const Nav = ({ handleSubmit, fetchError, showSpinner, handleDownload }) => {
   const [url, setUrl] = useState('');
   const [width, setWidth] = useState(1000);
-  const [height, setHeight] = useState(2000);
+  const [height, setHeight] = useState(8000);
   const [error, setError] = useState(false);
 
   return (
@@ -54,7 +54,7 @@ const Nav = ({ handleSubmit, fetchError, showSpinner, handleDownload }) => {
           onChange={(e) => {
             setHeight(e.target.value);
           }}
-          placeholder="2000"
+          placeholder="8000"
           value={height}
         />
         <Button
