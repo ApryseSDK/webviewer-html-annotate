@@ -20,7 +20,7 @@ const getHostPortSSL = (url) => {
     parsedSSL = https;
   } else if (url.startsWith('http://')) {
     parsedPort = 80;
-    parsedSSL = https;
+    parsedSSL = http;
   }
   return {
     parsedHost,
