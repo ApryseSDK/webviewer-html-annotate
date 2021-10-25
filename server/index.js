@@ -7,8 +7,28 @@ const http = require('http');
 const app = express();
 app.use(cors());
 
+
 const PORT = 3005;
 const PATH = `0.0.0.0:${PORT}`;
+
+const getHostPortSSL = (url) => {
+  const parsedHost = url.split('/').splice(2).splice(0, 1).join('/')
+  let parsedPort;
+  let parsedSSL; 
+  if (url.startsWith('https://')) {
+    parsedPort = 443;
+    parsedSSL = https;
+  } else if (url.startsWith('http://')) {
+    parsedPort = 80;
+    parsedSSL = https;
+  }
+  return {
+    parsedHost,
+    parsedPort,
+    parsedSSL,
+  }  
+}
+
 
 var url;
 
@@ -18,18 +38,12 @@ app.get('/website', function (req, res, next) {
 });
 
 app.use('/', function(clientRequest, clientResponse) {
-    console.log('----', clientRequest.hostname, clientRequest.url, clientRequest.originalUrl, '--', clientRequest.baseUrl, clientRequest.headers.location);
-    var parsedHost = url.split('/').splice(2).splice(0, 1).join('/')
-    console.log('parsedHost', parsedHost);
-    var parsedPort;
-    var parsedSSL;
-    if (url.startsWith('https://')) {
-        parsedPort = 443;
-        parsedSSL = https;
-    } else if (url.startsWith('http://')) {
-        parsedPort = 80;
-        parsedSSL = http;
-    }
+    const {
+      parsedHost,
+      parsedPort,
+      parsedSSL, 
+    } = getHostPortSSL(url);
+
     var options = { 
       hostname: parsedHost,
       port: parsedPort,
@@ -39,9 +53,9 @@ app.use('/', function(clientRequest, clientResponse) {
         'User-Agent': clientRequest.headers['user-agent']
       }
     };  
+    console.log('options', options);
 
     const callback = (serverResponse, clientResponse) => {
-      // console.log('headers------', serverResponse.headers);
       // Delete 'x-frame-options': 'SAMEORIGIN'
       // so that the page can be loaded in an iframe
       delete serverResponse.headers['x-frame-options'];
@@ -73,18 +87,25 @@ app.use('/', function(clientRequest, clientResponse) {
 
     var serverRequest = parsedSSL.request(options, serverResponse => {
       // This is the case of urls being redirected -> retrieve new headers['location'] and request again
-      if (serverResponse.statusCode !== 200) {
+      if (serverResponse.statusCode === 301) {
+        const {
+          parsedHost: newParsedHost,
+          parsedPort: newParsedPort,
+          parsedSSL: newParsedSSL, 
+        } = getHostPortSSL(serverResponse.headers['location']);
+
         var newOptions = {
-          hostname: parsedHost,
-          port: parsedPort,
+          hostname: newParsedHost,
+          port: newParsedPort,
           path: serverResponse.headers['location'],
           method: clientRequest.method,
           headers: {
             'User-Agent': clientRequest.headers['user-agent']
           }
         };
+        console.log('newOptions', newOptions);
 
-        var newServerRequest = parsedSSL.request(newOptions, newResponse => {
+        var newServerRequest = newParsedSSL.request(newOptions, newResponse => {
           callback(newResponse, clientResponse);
         }); 
         serverRequest.end();
