@@ -1,75 +1,104 @@
 // TAKEN FROM: https://stackoverflow.com/a/63602976
-var express = require('express')
-var app = express()
-var https = require('https');
-var http = require('http');
-const { response } = require('express');
+const express = require('express');
+const cors = require('cors');
+const https = require('https');
+const http = require('http');
 
-// app.get('/', function (req, res) {
-//   // console.log('hello world');
-//   // res.send('root')
-// })
+const app = express();
+app.use(cors());
+
+const PORT = 3005;
+const PATH = `0.0.0.0:${PORT}`;
+
+var url;
+
+app.get('/website', function (req, res, next) {
+  url = req.query.url;
+  next("route");
+});
 
 app.use('/', function(clientRequest, clientResponse) {
-    var url;
-    // url = 'https://www.teamliquid.com/'
-    // url = 'https://www.google.com'
     console.log('----', clientRequest.hostname, clientRequest.url, clientRequest.originalUrl, '--', clientRequest.baseUrl, clientRequest.headers.location);
-    url = 'https://www.pdftron.com';
     var parsedHost = url.split('/').splice(2).splice(0, 1).join('/')
     console.log('parsedHost', parsedHost);
     var parsedPort;
     var parsedSSL;
     if (url.startsWith('https://')) {
-        parsedPort = 443
-        parsedSSL = https
+        parsedPort = 443;
+        parsedSSL = https;
     } else if (url.startsWith('http://')) {
-        parsedPort = 80
-        parsedSSL = http
+        parsedPort = 80;
+        parsedSSL = http;
     }
     var options = { 
       hostname: parsedHost,
       port: parsedPort,
-      path: clientRequest.url,
+      path: url,
       method: clientRequest.method,
       headers: {
         'User-Agent': clientRequest.headers['user-agent']
       }
     };  
-  
-    var serverRequest = parsedSSL.request(options, function(serverResponse) { 
+
+    const callback = (serverResponse, clientResponse) => {
       // console.log('headers------', serverResponse.headers);
       // Delete 'x-frame-options': 'SAMEORIGIN'
       // so that the page can be loaded in an iframe
       delete serverResponse.headers['x-frame-options'];
-      var body = '';   
+      delete serverResponse.headers['content-security-policy'];
+      var body = '';
       if (String(serverResponse.headers['content-type']).indexOf('text/html') !== -1) {
-        serverResponse.on('data', function(chunk) {
+        serverResponse.on('data', function (chunk) {
           body += chunk;
-        }); 
-  
-        serverResponse.on('end', function() {
+        });
+
+        serverResponse.on('end', function () {
           // Make changes to HTML files when they're done being read.
-          body = body.replace(`example`, `Cat!` );
-  
+          body = body.replace(`example`, `Cat!`);
+
           clientResponse.writeHead(serverResponse.statusCode, serverResponse.headers);
           clientResponse.end(body);
-        }); 
-      }   
+        });
+      }
       else {
         serverResponse.pipe(clientResponse, {
           end: true
-        }); 
+        });
         // Can be undefined
         if (serverResponse.headers['content-type']) {
           clientResponse.contentType(serverResponse.headers['content-type'])
         }
-      }   
-    }); 
+      }
+    }
+
+    var serverRequest = parsedSSL.request(options, serverResponse => {
+      // This is the case of urls being redirected -> retrieve new headers['location'] and request again
+      if (serverResponse.statusCode !== 200) {
+        var newOptions = {
+          hostname: parsedHost,
+          port: parsedPort,
+          path: serverResponse.headers['location'],
+          method: clientRequest.method,
+          headers: {
+            'User-Agent': clientRequest.headers['user-agent']
+          }
+        };
+
+        var newServerRequest = parsedSSL.request(newOptions, newResponse => {
+          callback(newResponse, clientResponse);
+        }); 
+        serverRequest.end();
+        newServerRequest.end();
+        return;
+      }
+
+      callback(serverResponse, clientResponse);
+    });
   
     serverRequest.end();
+
   });    
 
 
-  app.listen(3000)
-  console.log('Running on 0.0.0.0:3000')
+  app.listen(PORT);
+  console.log(`Running on ${PATH}`);

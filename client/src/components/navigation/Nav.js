@@ -30,10 +30,10 @@ const Nav = ({ handleSubmit, fetchError, showSpinner, handleDownload }) => {
         <FormLabel>URL of the page</FormLabel>
         <InputGroup
           onChange={(e) => {
-            setUrl(`http://${e.target.value}`);
+            setUrl(`https://${e.target.value}`);
           }}
         >
-          <InputLeftAddon children="http://" />
+          <InputLeftAddon children="https://" />
           <Input placeholder="mysite" />
         </InputGroup>
       </FormControl>

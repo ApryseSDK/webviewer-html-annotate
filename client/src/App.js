@@ -9,43 +9,30 @@ function App() {
   const [fetchError, setFetchError] = useState('');
   const [pdfBlob, setPdfBlob] = useState(null);
 
+  const PORT = 3005;
+  const PATH = `0.0.0.0:${PORT}`;
+
+
   const loadURL = (url, width, height) => {
     // setShow(true);
-    setResponse({
-      // url: 'http://localhost:8080/www.google.ca',
-      url: 'http://localhost:3000',
-      // origUrl: 'http://localhost:8080/www.google.ca',
-      origUrl: 'http://localhost:3000',
-      width: 1800,
-      height: 8000,
-      thumb: '',
-    })
 
-    // fetch(
-    //   `http://127.0.0.1:3001/website?url=${url}&width=${width}&height=${height}`
-    // )
-    //   .then(async (response) => {
-    //     if (response.ok) {
-    //       const json = await response.json();
-    //       if (json.data.url) {
-    //         json.data.url = `http://localhost:3000/redirect/${json.data.url}`;
-    //       }
-    //       setResponse({
-    //         url: json.data.url,
-    //         width,
-    //         height,
-    //         thumb: json.data.thumb,
-    //         origUrl: url
-    //       });
-    //       setShow(false);
-    //     }
-    //   })
-    //   .catch((err) => {
-    //     setShow(false);
-    //     setFetchError(
-    //       'Trouble fetching the URL, please make sure the server is running. `cd server && npm start`'
-    //     );
-    //   });
+    fetch(`http://${PATH}/website?url=${url}`)
+      .then(async (response) => {
+          setResponse({
+            url: `http://${PATH}`,
+            width: 1800,
+            height: 6000,
+            thumb: '',
+            origUrl: `http://${PATH}`,
+          });
+          setShow(false);
+      })
+      .catch((err) => {
+        setShow(false);
+        setFetchError(
+          'Trouble fetching the URL, please make sure the server is running. `cd server && npm start`'
+        );
+      });
   };
 
   const downloadPDF = () => {
