@@ -9,7 +9,7 @@ function App() {
   const [fetchError, setFetchError] = useState('');
   const [pdfBlob, setPdfBlob] = useState(null);
 
-  const PORT = 3005;
+  const PORT = 3100;
   const PATH = `0.0.0.0:${PORT}`;
 
 

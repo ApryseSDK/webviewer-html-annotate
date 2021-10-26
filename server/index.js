@@ -7,8 +7,7 @@ const http = require('http');
 const app = express();
 app.use(cors());
 
-
-const PORT = 3005;
+const PORT = 3100;
 const PATH = `0.0.0.0:${PORT}`;
 
 const getHostPortSSL = (url) => {
@@ -29,6 +28,7 @@ const getHostPortSSL = (url) => {
   }  
 }
 
+const isUrlAbsolute = (url) => (url.indexOf('://') > 0 || url.indexOf('//') === 0);
 
 var url;
 
@@ -60,6 +60,11 @@ app.use('/', function(clientRequest, clientResponse) {
       // so that the page can be loaded in an iframe
       delete serverResponse.headers['x-frame-options'];
       delete serverResponse.headers['content-security-policy'];
+
+      // if a url is blown up, make sure to reset cache-control
+      // if (!!serverResponse.headers['cache-control'] && /max-age=[^0]/.test(String(serverResponse.headers['cache-control']))) {
+      //   serverResponse.headers['cache-control'] = 'max-age=0';
+      // }
       var body = '';
       if (String(serverResponse.headers['content-type']).indexOf('text/html') !== -1) {
         serverResponse.on('data', function (chunk) {
@@ -86,18 +91,22 @@ app.use('/', function(clientRequest, clientResponse) {
     }
 
     var serverRequest = parsedSSL.request(options, serverResponse => {
+      console.log('serverResponse', serverResponse.statusCode, serverResponse.headers)
       // This is the case of urls being redirected -> retrieve new headers['location'] and request again
-      if (serverResponse.statusCode === 301) {
+      if (serverResponse.statusCode > 299 && serverResponse.statusCode < 400) {
+        var location = serverResponse.headers['location'];
+        var parsedLocation = isUrlAbsolute(location) ? location : `https://${parsedHost}${location}`;
+
         const {
           parsedHost: newParsedHost,
           parsedPort: newParsedPort,
           parsedSSL: newParsedSSL, 
-        } = getHostPortSSL(serverResponse.headers['location']);
+        } = getHostPortSSL(parsedLocation);
 
         var newOptions = {
           hostname: newParsedHost,
           port: newParsedPort,
-          path: serverResponse.headers['location'],
+          path: parsedLocation,
           method: clientRequest.method,
           headers: {
             'User-Agent': clientRequest.headers['user-agent']
@@ -106,6 +115,7 @@ app.use('/', function(clientRequest, clientResponse) {
         console.log('newOptions', newOptions);
 
         var newServerRequest = newParsedSSL.request(newOptions, newResponse => {
+          console.log('new serverResponse', newResponse.statusCode, newResponse.headers)
           callback(newResponse, clientResponse);
         }); 
         serverRequest.end();
