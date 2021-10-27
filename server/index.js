@@ -59,7 +59,7 @@ app.use('/', function(clientRequest, clientResponse) {
       parsedSSL, 
     } = getHostPortSSL(url);
 
-    // convert to original url, only happens during first request
+    // convert to original url, since clientRequest.url starts from /website-proxy-pdftron and will be redirected
     if (clientRequest.url.startsWith('/website-proxy-pdftron')) {
       clientRequest.url = url;
     }
