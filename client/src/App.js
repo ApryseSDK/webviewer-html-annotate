@@ -5,7 +5,7 @@ import './App.css';
 
 function App() {
   const [response, setResponse] = useState({});
-  const [show, setShow] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState('');
   const [pdfBlob, setPdfBlob] = useState(null);
 
@@ -14,9 +14,9 @@ function App() {
 
 
   const loadURL = (url, width, height) => {
-    // setShow(true);
-
-    fetch(`http://${PATH}/website?url=${url}`)
+    setLoading(true);
+    setFetchError('');
+    fetch(`http://${PATH}/website-proxy-pdftron?url=${url}`)
       .then(async (response) => {
           setResponse({
             url: `http://${PATH}`,
@@ -25,10 +25,10 @@ function App() {
             thumb: '',
             origUrl: `http://${PATH}`,
           });
-          setShow(false);
+        setLoading(false);
       })
       .catch((err) => {
-        setShow(false);
+        setLoading(false);
         setFetchError(
           'Trouble fetching the URL, please make sure the server is running. `cd server && npm start`'
         );
@@ -36,7 +36,7 @@ function App() {
   };
 
   const downloadPDF = () => {
-    setShow(true);
+    setLoading(true);
     if (response.url) {
       const urlArray = response.url.split('/');
       fetch(
@@ -48,7 +48,7 @@ function App() {
         setPdfBlob(blob);
       });
     }
-    setShow(false);
+    setLoading(false);
   };
 
   return (
@@ -56,7 +56,7 @@ function App() {
       <Nav
         handleSubmit={loadURL}
         fetchError={fetchError}
-        showSpinner={show}
+        showSpinner={loading}
         handleDownload={downloadPDF}
       />
       <Viewer res={response} loadURL={loadURL} pdf={pdfBlob} />

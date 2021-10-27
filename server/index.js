@@ -29,12 +29,27 @@ const getHostPortSSL = (url) => {
 }
 
 const isUrlAbsolute = (url) => (url.indexOf('://') > 0 || url.indexOf('//') === 0);
+const isUrlNested = (url) => {
+  let nested = url.split('/').splice(3);
+  if (nested.length > 0 && nested[0] != '') {
+    return true;
+  }
+  return false;
+}
 
 var url;
 
-app.get('/website', function (req, res, next) {
+app.get('/website-proxy-pdftron', function (req, res, next) {
+  // this is the url retrieved from the input
   url = req.query.url;
-  next("route");
+  console.log('\x1b[31m%s\x1b[0m', `
+    ***********************************************************************
+    ************************** NEW REQUEST ********************************
+    ***********************************************************************
+  `);
+
+  // next("router") pass control to next route and strip all req.query, if queried url contains nested route this will be lost in subsequest requests
+  next();
 });
 
 app.use('/', function(clientRequest, clientResponse) {
@@ -44,16 +59,28 @@ app.use('/', function(clientRequest, clientResponse) {
       parsedSSL, 
     } = getHostPortSSL(url);
 
+    // convert to original url, only happens during first request
+    if (clientRequest.url.startsWith('/website-proxy-pdftron')) {
+      clientRequest.url = url;
+    }
+
+    // if url has nested route then convert to original url to force request it
+    // did not work with nested urls from developer.mozilla.org
+    // check if nested route cause instagram.com doesn't like this
+    if (isUrlNested(url) && clientRequest.url === '/') {
+      clientRequest.url = url;
+    }
+
     var options = { 
       hostname: parsedHost,
       port: parsedPort,
-      path: url,
+      path: clientRequest.url,
       method: clientRequest.method,
       headers: {
         'User-Agent': clientRequest.headers['user-agent']
       }
-    };  
-    console.log('options', options);
+    };
+    console.log('hostname', options.hostname, 'path', options.path);
 
     const callback = (serverResponse, clientResponse) => {
       // Delete 'x-frame-options': 'SAMEORIGIN'
@@ -62,9 +89,9 @@ app.use('/', function(clientRequest, clientResponse) {
       delete serverResponse.headers['content-security-policy'];
 
       // if a url is blown up, make sure to reset cache-control
-      // if (!!serverResponse.headers['cache-control'] && /max-age=[^0]/.test(String(serverResponse.headers['cache-control']))) {
-      //   serverResponse.headers['cache-control'] = 'max-age=0';
-      // }
+      if (!!serverResponse.headers['cache-control'] && /max-age=[^0]/.test(String(serverResponse.headers['cache-control']))) {
+        serverResponse.headers['cache-control'] = 'max-age=0';
+      }
       var body = '';
       if (String(serverResponse.headers['content-type']).indexOf('text/html') !== -1) {
         serverResponse.on('data', function (chunk) {
@@ -112,7 +139,7 @@ app.use('/', function(clientRequest, clientResponse) {
             'User-Agent': clientRequest.headers['user-agent']
           }
         };
-        console.log('newOptions', newOptions);
+        console.log('newhostname', newOptions.hostname, 'newpath', newOptions.path);
 
         var newServerRequest = newParsedSSL.request(newOptions, newResponse => {
           console.log('new serverResponse', newResponse.statusCode, newResponse.headers)
