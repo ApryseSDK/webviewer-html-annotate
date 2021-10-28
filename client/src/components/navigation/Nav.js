@@ -14,8 +14,6 @@ import './Nav.css';
 
 const Nav = ({ handleSubmit, fetchError, showSpinner, handleDownload }) => {
   const [url, setUrl] = useState('');
-  const [width, setWidth] = useState(1000);
-  const [height, setHeight] = useState(8000);
   const [error, setError] = useState(false);
 
   return (
@@ -37,31 +35,12 @@ const Nav = ({ handleSubmit, fetchError, showSpinner, handleDownload }) => {
           <Input placeholder="mysite" />
         </InputGroup>
       </FormControl>
-      <FormControl id="width">
-        <FormLabel>Width of the page</FormLabel>
-        <Input
-          size="md"
-          onChange={(e) => {
-            setWidth(e.target.value);
-          }}
-          value={width}
-        />
-      </FormControl>
-      <FormControl id="height">
-        <FormLabel>Height of the page</FormLabel>
-        <Input
-          size="md"
-          onChange={(e) => {
-            setHeight(e.target.value);
-          }}
-          placeholder="8000"
-          value={height}
-        />
+      <FormControl id="submit">
         <Button
           my={3}
           onClick={() => {
-            if (url !== '' && width !== 0 && height !== 0) {
-              handleSubmit(url, width, height);
+            if (!!url) {
+              handleSubmit(url);
             } else {
               setError(true);
             }

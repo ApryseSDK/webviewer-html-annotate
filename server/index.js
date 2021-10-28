@@ -7,6 +7,8 @@ const http = require('http');
 const app = express();
 app.use(cors());
 
+const puppeteer = require('puppeteer');
+
 const PORT = 3100;
 const PATH = `0.0.0.0:${PORT}`;
 
@@ -38,8 +40,9 @@ const isUrlNested = (url) => {
 }
 
 var url;
+var dimensions;
 
-app.get('/website-proxy-pdftron', function (req, res, next) {
+app.get('/website-proxy-pdftron', async function (req, res, next) {
   // this is the url retrieved from the input
   url = req.query.url;
   console.log('\x1b[31m%s\x1b[0m', `
@@ -47,6 +50,23 @@ app.get('/website-proxy-pdftron', function (req, res, next) {
     ************************** NEW REQUEST ********************************
     ***********************************************************************
   `);
+
+  const browser = await puppeteer.launch({
+    defaultViewport: { width: 1680, height: 1050 },
+    headless: true,
+  });
+  const page = await browser.newPage();
+  await page.goto(url);
+
+  // Get the "viewport" of the page, as reported by the page.
+  dimensions = await page.evaluate(() => {
+    return {
+      width: document.body.clientWidth,
+      height: document.body.clientHeight,
+    };
+  });
+
+  await browser.close();
 
   // next("router") pass control to next route and strip all req.query, if queried url contains nested route this will be lost in subsequest requests
   next();
@@ -102,7 +122,8 @@ app.use('/', function(clientRequest, clientResponse) {
           // Make changes to HTML files when they're done being read.
           body = body.replace(`example`, `Cat!`);
 
-          clientResponse.writeHead(serverResponse.statusCode, serverResponse.headers);
+          // can also send dimensions in clientResponse.setHeader() but for some reason, on client can't read response.headers.get() but it's available in the network tab
+          clientResponse.writeHead(serverResponse.statusCode, JSON.stringify(dimensions), serverResponse.headers);
           clientResponse.end(body);
         });
       }

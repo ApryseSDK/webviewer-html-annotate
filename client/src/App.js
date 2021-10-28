@@ -13,18 +13,22 @@ function App() {
   const PATH = `0.0.0.0:${PORT}`;
 
 
-  const loadURL = (url, width, height) => {
+  const loadURL = (url) => {
     setLoading(true);
     setFetchError('');
     fetch(`http://${PATH}/website-proxy-pdftron?url=${url}`)
       .then(async (response) => {
-          setResponse({
-            url: `http://${PATH}`,
-            width: 1800,
-            height: 6000,
-            thumb: '',
-            origUrl: `http://${PATH}`,
-          });
+        var size = { width: 1800, height: 7000 };
+        try {
+          size = JSON.parse(response.statusText);
+        } catch (e) {
+        }
+        setResponse({
+          url: `http://${PATH}`,
+          thumb: '',
+          ...size,
+          origUrl: `http://${PATH}`,
+        });
         setLoading(false);
       })
       .catch((err) => {

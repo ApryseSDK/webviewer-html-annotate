@@ -17,7 +17,7 @@ const Viewer = ({ res, loadURL, pdf }) => {
     ).then(async (instance) => {
       const { FitMode, docViewer } = instance;
       setInstance(instance);
-      instance.setFitMode(FitMode.FitPage);
+      instance.setFitMode(FitMode.FitWidth);
       // disable some incompatible tools
       instance.disableElements([
         'highlightToolGroupButton',
@@ -35,13 +35,16 @@ const Viewer = ({ res, loadURL, pdf }) => {
 
       docViewer.on('documentLoaded', () => {
         setTimeout(() => {
-          instance.setFitMode(FitMode.FitPage);
+          if (instance.getFitMode() !== FitMode.FitWidth) {
+            instance.setFitMode(FitMode.FitWidth);
+          }
         }, 1500);
       });
 
       setHTMLModule(htmlModule);
+      console.log(htmlModule)
 
-      loadURL(`https://www.pdftron.com/`, 1800, 1100);
+      loadURL(`https://www.pdftron.com/`);
     });
     // eslint-disable-next-line
   }, []);
