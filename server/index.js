@@ -39,6 +39,7 @@ const isUrlNested = (url) => {
   return false;
 }
 
+const defaultViewport = { width: 1680, height: 1050 };
 var url;
 var dimensions;
 
@@ -52,7 +53,7 @@ app.get('/website-proxy-pdftron', async function (req, res, next) {
   `);
 
   const browser = await puppeteer.launch({
-    defaultViewport: { width: 1680, height: 1050 },
+    defaultViewport,
     headless: true,
   });
   const page = await browser.newPage();
@@ -70,6 +71,24 @@ app.get('/website-proxy-pdftron', async function (req, res, next) {
 
   // next("router") pass control to next route and strip all req.query, if queried url contains nested route this will be lost in subsequest requests
   next();
+});
+
+// need to be placed before app.use('/');
+app.get('/pdftron-pdf', async (req, res) => {
+  const browser = await puppeteer.launch({
+    defaultViewport,
+    headless: true,
+  });
+  const page = await browser.newPage();
+  await page.goto(`http://${PATH}`, {
+    waitUntil: 'networkidle0'
+  });
+
+  const buffer = await page.screenshot({ type: 'png', fullPage: true });
+  await browser.close();
+
+  // read the file from the filepath and respond to server
+  res.send(buffer);
 });
 
 app.use('/', function(clientRequest, clientResponse) {

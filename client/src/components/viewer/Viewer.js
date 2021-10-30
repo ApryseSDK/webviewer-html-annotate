@@ -3,10 +3,11 @@ import { initializeHTMLViewer } from '@pdftron/webviewer-html';
 import { useEffect, useRef, useState } from 'react';
 import './Viewer.css';
 
-const Viewer = ({ res, loadURL, pdf }) => {
+const Viewer = ({ res, loadURL, buffer, loading }) => {
   const viewer = useRef(null);
   const [HTMLModule, setHTMLModule] = useState(null);
   const [instance, setInstance] = useState(null);
+  const [size, setSize] = useState({});
 
   useEffect(() => {
     WebViewer(
@@ -42,7 +43,6 @@ const Viewer = ({ res, loadURL, pdf }) => {
       });
 
       setHTMLModule(htmlModule);
-      console.log(htmlModule)
 
       loadURL(`https://www.pdftron.com/`);
     });
@@ -52,13 +52,20 @@ const Viewer = ({ res, loadURL, pdf }) => {
   useEffect(() => {
     if (HTMLModule && Object.keys(res).length > 0) {
       const { url, width, height, thumb, origUrl } = res;
+      setSize({width, height});
       HTMLModule.loadHTMLPage({ url, width, height, thumb, origUrl });
     }
   }, [HTMLModule, res]);
 
   useEffect(() => {
     const loadDocAndAnnots = async () => {
-      const doc = await instance.CoreControls.createDocument(pdf);
+      loading(true);
+      const doc = await instance.Core.createDocument(buffer, { 
+        extension: 'png',
+        pageSizes: [size],
+      });
+
+      // exportAnnotations as xfdfString seem to misplace annotations
       const xfdf = await instance.docViewer
         .getAnnotationManager()
         .exportAnnotations();
@@ -71,14 +78,16 @@ const Viewer = ({ res, loadURL, pdf }) => {
       a.download = 'annotated';
       a.click();
       a.remove();
+      loading(false);
       // in case the Blob uses a lot of memory
       setTimeout(() => URL.revokeObjectURL(url), 7000);
     };
 
-    if (instance && pdf) {
+    if (instance && buffer) {
       loadDocAndAnnots();
     }
-  }, [instance, pdf]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [instance, buffer]);
 
   return <div ref={viewer} className="HTMLViewer"></div>;
 };

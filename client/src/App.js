@@ -7,7 +7,7 @@ function App() {
   const [response, setResponse] = useState({});
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState('');
-  const [pdfBlob, setPdfBlob] = useState(null);
+  const [buffer, setBuffer] = useState(null);
 
   const PORT = 3100;
   const PATH = `0.0.0.0:${PORT}`;
@@ -17,10 +17,10 @@ function App() {
     setLoading(true);
     setFetchError('');
     fetch(`http://${PATH}/website-proxy-pdftron?url=${url}`)
-      .then(async (response) => {
+      .then(async (res) => {
         var size = { width: 1800, height: 7000 };
         try {
-          size = JSON.parse(response.statusText);
+          size = JSON.parse(res.statusText);
         } catch (e) {
         }
         setResponse({
@@ -40,20 +40,19 @@ function App() {
   };
 
   const downloadPDF = () => {
-    setLoading(true);
     if (response.url) {
-      const urlArray = response.url.split('/');
-      fetch(
-        `http://127.0.0.1:3001/getpdf?url=${urlArray[4]}&width=${response.width}&height=${response.height}`
-      ).then((res) => {
-        return res.blob('application/pdf');
-      }).then((blob) => {
-        console.log(blob);
-        setPdfBlob(blob);
-      });
+      setLoading(true);
+      fetch(`http://${PATH}/pdftron-pdf`)
+        .then(async (res) => {
+          console.log(res);
+          setBuffer(res);
+          setLoading(false);
+        }).catch(err => console.log(err));
     }
-    setLoading(false);
   };
+
+  // receive new loading state from Viewer as loadDocAndAnnots takes a while
+  const loadingFromViewer = (value) => setLoading(value);
 
   return (
     <div className="App">
@@ -63,7 +62,7 @@ function App() {
         showSpinner={loading}
         handleDownload={downloadPDF}
       />
-      <Viewer res={response} loadURL={loadURL} pdf={pdfBlob} />
+      <Viewer res={response} loadURL={loadURL} buffer={buffer} loading={loadingFromViewer} />
     </div>
   );
 }

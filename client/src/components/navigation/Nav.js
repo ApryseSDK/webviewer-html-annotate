@@ -16,6 +16,12 @@ const Nav = ({ handleSubmit, fetchError, showSpinner, handleDownload }) => {
   const [url, setUrl] = useState('');
   const [error, setError] = useState(false);
 
+  // test is URL (without https://) is valid https://regexr.com/3e6m0
+  const isValidURL = (url) => {
+    // eslint-disable-next-line no-useless-escape
+    return /(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/gi.test(url);
+  }
+
   return (
     <div className="Nav">
       <Heading size="md">WebViewer HTML</Heading>
@@ -28,19 +34,20 @@ const Nav = ({ handleSubmit, fetchError, showSpinner, handleDownload }) => {
         <FormLabel>URL of the page</FormLabel>
         <InputGroup
           onChange={(e) => {
-            setUrl(`https://${e.target.value}`);
+            setUrl(e.target.value);
           }}
         >
           <InputLeftAddon children="https://" />
           <Input placeholder="mysite" />
         </InputGroup>
       </FormControl>
-      <FormControl id="submit">
+      <FormControl>
         <Button
           my={3}
           onClick={() => {
-            if (!!url) {
-              handleSubmit(url);
+            setError(false);
+            if (!!url && isValidURL(url)) {
+              handleSubmit(`https://${url}`);
             } else {
               setError(true);
             }
@@ -49,8 +56,6 @@ const Nav = ({ handleSubmit, fetchError, showSpinner, handleDownload }) => {
           {showSpinner && <Spinner mx={1} label="Loading website" />}Load the
           website
         </Button>
-      </FormControl>
-      <FormControl id="downloadPDF">
         <Button my={3} onClick={() => handleDownload()}>
           {showSpinner && <Spinner mx={1} label="Loading website" />}Download
           annotated PDF
@@ -59,7 +64,7 @@ const Nav = ({ handleSubmit, fetchError, showSpinner, handleDownload }) => {
 
       {error && (
         <Text color="red">
-          Please enter a valid URL, width and height and try again.
+          Please enter a valid URL try again.
         </Text>
       )}
       {fetchError ? <Text color="red">{fetchError}</Text> : null}
