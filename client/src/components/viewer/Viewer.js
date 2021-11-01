@@ -70,8 +70,7 @@ const Viewer = ({ res, loadURL, buffer, loading }) => {
         .getAnnotationManager()
         .exportAnnotations();
       const data = await doc.getFileData({ xfdfString: xfdf });
-      const arr = new Uint8Array(data);
-      const blob = new Blob([arr], { type: 'application/pdf' });
+      const blob = new Blob([data], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
