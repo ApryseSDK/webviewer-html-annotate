@@ -26,9 +26,8 @@ const Nav = ({ handleSubmit, fetchError, showSpinner, handleDownload }) => {
     <div className="Nav">
       <Heading size="md">WebViewer HTML</Heading>
       <Text py={5}>
-        In this demo, you can pass any URL. The URL passed in will be scraped
-        and saved server-side as a snapshot in time. Then you will be annotate
-        that copy here.
+        In this demo, you can pass any URL. The URL passed in will be proxied
+        and you will be able to annotate directly here.
       </Text>
       <FormControl id="domain">
         <FormLabel>URL of the page</FormLabel>
