@@ -79,7 +79,7 @@ const Viewer = ({ res, loadURL, buffer, loading }) => {
       a.remove();
       loading(false);
       // in case the Blob uses a lot of memory
-      setTimeout(() => URL.revokeObjectURL(url), 7000);
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
     };
 
     if (instance && buffer) {
